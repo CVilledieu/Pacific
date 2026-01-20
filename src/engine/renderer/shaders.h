@@ -6,9 +6,9 @@
 
 void ShaderInit(void);
 
-void useShaderProgram(void);
+void setProgram(void);
 
-void terminateShaders(void);
+void TerminateShaders(void);
 
 
 

@@ -6,6 +6,7 @@
 
 
 int RendInit(void);
+void Render(void);
 
 void CleanCanvas(void);
 void Serve(void);

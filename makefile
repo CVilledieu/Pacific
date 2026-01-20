@@ -1,26 +1,41 @@
 CC = gcc
-TARGET = pacific.exe
+TARGET = bin/pacific.exe
 
 INC = -I./src -I./include
 CFLAGS = -Wall -Wextra $(INC)
 LDFLAGS = -lglfw3 -lopengl32 -lgdi32 -luser32 -lkernel32 -lm
 
 SRC = $(wildcard src/*.c) $(wildcard src/engine/*.c) $(wildcard src/engine/renderer/*.c) $(wildcard src/engine/win/*.c)
-OBJ = $(patsubst src/%.c,build/%.o,$(SRC))
+OBJ = $(patsubst src/%.c,bin/%.o,$(SRC))
 
-.PHONY: all clean run
 
-all: $(TARGET)
+
+all: raze $(TARGET) purge migrate
 
 $(TARGET): $(OBJ)
+	@mkdir -p bin
 	$(CC) $(OBJ) -o $@ $(LDFLAGS)
 
-build/%.o: src/%.c
+bin/%.o: src/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-clean:
-	rm -rf build/*.o build/engine/*.o build/engine/renderer/*.o build/engine/win/*.o $(TARGET)
+# Copies necessary runtime assests into bin/
+migrate: 
+	@mkdir -p bin
+	@cp -r assests bin/
 
-run: $(TARGET)
-	./$(TARGET)
+# Ensures all old files are removed
+raze:
+	rm -rf bin/
+
+# Removes compiling artifacts
+purge:
+	rm -rf bin/*.o bin/*/
+
+# Compiles and runs the program for faster development
+run: all
+	cd bin && ./pacific.exe
+
+
+.PHONY: all raze run purge migrate 

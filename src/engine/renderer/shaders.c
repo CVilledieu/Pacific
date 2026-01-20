@@ -26,7 +26,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#define SHADER_DIR "assets/shaders/"
+#define SHADER_DIR "assests/shader/"
 
 // DevNote: Possible useful struct for future shader management system
 // Most shaders would share the same base file names with different extensions for easier management
@@ -45,23 +45,24 @@ static unsigned int programID = 0;
 // Returned string is null-terminated.
 static unsigned int CompileShader(const char* shaderName, GLenum shaderType){
     char path[256];
-    sprintf(path, "%.15s%.240s\0", SHADER_DIR, shaderName);
+    sprintf(path, "%s%s", SHADER_DIR, shaderName);
     FILE* fp;
-    fp = fopen(path, "r");
+    fp = fopen(path, "rb");
 
     assert(fp != NULL && "Failed to open shader file. Check file paths.");
     
     fseek(fp, 0, SEEK_END);
     long fileSize = ftell(fp);
-
-    char shadeBuffer[fileSize + 1];
     rewind(fp);
+
+    char* shadeBuffer = malloc(fileSize + 1);
     fread(shadeBuffer, 1, fileSize, fp);
     shadeBuffer[fileSize] = '\0';
     fclose(fp);
 
     unsigned int shader = glCreateShader(shaderType);
-    glShaderSource(shader, 1, &shadeBuffer, NULL);
+    const char* shaderSource = shadeBuffer;
+    glShaderSource(shader, 1, &shaderSource, NULL);
     glCompileShader(shader);
     
     int success;
@@ -70,9 +71,11 @@ static unsigned int CompileShader(const char* shaderName, GLenum shaderType){
     if (!success) {
         glGetShaderInfoLog(shader, 512, NULL, infoLog);
         printf("Error:: Shader failed to compile. \n Shader path: %s \nShader type: %d \n%s \n", path, shaderType, infoLog);
+        free(shadeBuffer);
         exit(EXIT_FAILURE);
     }
 
+    free(shadeBuffer);
     return shader;
 }
 
@@ -94,6 +97,6 @@ void setProgram(void){
     glUseProgram(programID);
 }
 
-void terminateShaders(void){
+void TerminateShaders(void){
     glDeleteProgram(programID);
 }

@@ -15,16 +15,20 @@
 #include "root.h"
 #include "win/window.h"
 #include "renderer/render.h"
+#include "renderer/shaders.h"
 
 // Calls subsystem initialization functions in correct order. Since the engine is intended to be simply a state machine, there is nothing for the engine itself to initialize.
 void InitEngine(void){
     // DevNote: More robust error handling should be implemented. Consider logging system and exiting with error codes instead of just returning from the function. At the moment, if a subsystem fails I am just returning to end up exiting the program anyway.
-    if (WndInit() || RendInit()) {
+    if (WndInit()) {
         return;
     }
-    if (RenderInit()) {
+
+    ShaderInit();
+    if (RendInit()) {
         return;
     }
+    
 }
 
 void RunEngine(void){
@@ -40,4 +44,6 @@ void RunEngine(void){
 // Calls all subsystems' termination/cleanup functions
 void TerminateEngine(void){
     CloseWindow();
+    TerminateShaders();
+    
 }
