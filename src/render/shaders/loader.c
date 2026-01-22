@@ -17,7 +17,6 @@
 
 // DevNote: Shader names will be hard coded for simplicity and ease of development, but if more shaders are required or added I will consider implementing a more robust shader management system. I will be focusing on getting the basic rendering functionality working without getting bogged down in implementing a more complex system that not needed. Error handling for shader compilation and linking is currently omitted for simplicity. Will be added later. Possible Options: read dir contents to load all shaders in a directory, or implement a shader registry to manage multiple shaders.
 
-#include "shaders.h"
 
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>

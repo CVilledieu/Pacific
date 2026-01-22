@@ -1,4 +1,4 @@
-#include "window.h"
+#include "new.h"
 #include <stdlib.h>
 
 Wnd* mainWindow;

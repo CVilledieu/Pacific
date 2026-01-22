@@ -13,9 +13,9 @@
 
 // Project headers
 #include "root.h"
-#include "win/window.h"
-#include "renderer/render.h"
-#include "renderer/shaders.h"
+#include "window/new.h"
+#include "objects/new.h"
+#include "shaders/loader.h"
 
 // Calls subsystem initialization functions in correct order. Since the engine is intended to be simply a state machine, there is nothing for the engine itself to initialize.
 void InitEngine(void){

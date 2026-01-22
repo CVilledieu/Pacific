@@ -1,5 +1,5 @@
-#ifndef __ENGINE_WINDOW_H__
-#define __ENGINE_WINDOW_H__
+#ifndef __WINDOW_NEW_H__
+#define __WINDOW_NEW_H__
 
 
 #include "GLAD/glad.h"
