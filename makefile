@@ -5,7 +5,10 @@ INC = -I./src -I./include
 CFLAGS = -Wall -Wextra $(INC)
 LDFLAGS = -lglfw3 -lopengl32 -lgdi32 -luser32 -lkernel32 -lm
 
-SRC = $(wildcard src/*.c) $(wildcard src/engine/*.c) $(wildcard src/engine/renderer/*.c) $(wildcard src/engine/win/*.c)
+SUB = window util render objects
+SRC = $(wildcard src/*.c) $(wildcard src/*/*.c)
+
+#SRC = $(wildcard src/*.c)  $(wildcard src/objects/*.c) $(wildcard src/render/*.c) $(wildcard src/window/*.c)
 OBJ = $(patsubst src/%.c,bin/%.o,$(SRC))
 
 

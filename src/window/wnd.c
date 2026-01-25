@@ -1,11 +1,11 @@
-#include "new.h"
+#include "wnd.h"
 #include <stdlib.h>
 
 Wnd* mainWindow;
 
 void setCallbacks(void);
 
-int WndInit(void){
+int createWindow(void){
     if (!glfwInit()){
         return 1;
     }
@@ -58,7 +58,7 @@ void setCallbacks(void){
     glfwSetFramebufferSizeCallback(mainWindow->window, callback_wndSize_Update);
 }
 
-void CloseWindow(void){
+void closeWindow(void){
     if (mainWindow->window) {
         glfwDestroyWindow(mainWindow->window);
     }

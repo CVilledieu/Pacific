@@ -1,5 +1,5 @@
-#ifndef __WINDOW_NEW_H__
-#define __WINDOW_NEW_H__
+#ifndef __WINDOW_H__
+#define __WINDOW_H__
 
 
 #include "GLAD/glad.h"
@@ -13,7 +13,7 @@ typedef struct Wnd {
 
 extern Wnd* mainWindow;
 
-int WndInit(void);
-void CloseWindow(void);
+int createWindow(void);
+void closeWindow(void);
 
 #endif
