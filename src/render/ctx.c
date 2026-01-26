@@ -12,17 +12,19 @@
 #include <stdio.h>
 
 RenderCtx_t rCtx = {0};
-
+ViewCtx_t view = {0};
 
 void initCtx(void){
     rCtx.PID = initShaders();
     rCtx.VAO = createPrimitive(PRIM_SQUARE);
-    initObjectList();
+
+    view.height = 0.2f;
+    view.width = 0.2f;
+
+    initObjects(view.width, view.height);
+
+    initPerspective(&view);
 }
-
-
-
-
 
 void drawLoop(void){
     while(!glfwWindowShouldClose(mainWindow->window)){
@@ -32,7 +34,7 @@ void drawLoop(void){
         glUseProgram(rCtx.PID);
         glBindVertexArray(rCtx.VAO);
 
-        setViewTransformation(rCtx.PID);
+        setPerspective(rCtx.PID);
 
         drawModels();
 
@@ -42,6 +44,4 @@ void drawLoop(void){
         glfwPollEvents();
     }    
 }
-
-
 

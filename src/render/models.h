@@ -5,15 +5,19 @@
 
 #define MAX_OBJECTS 100
 
-typedef struct ObjectList_t{
+// SoA approach to organizing object data
+typedef struct Objects_t{
     float xPos[MAX_OBJECTS];
     float yPos[MAX_OBJECTS];
+
+    float xVel[MAX_OBJECTS];
+    float yVel[MAX_OBJECTS];
+
     float xSize[MAX_OBJECTS];
     float ySize[MAX_OBJECTS];
-    int objCount;
-} ObjectList_t;
+} Objects_t;
 
-void initObjectList(void);
+void initObjects(float x, float y);
 
 void drawModels(void);
 
