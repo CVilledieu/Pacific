@@ -1,5 +1,5 @@
-#ifndef __RENDER_SHADERS_H__
-#define __RENDER_SHADERS_H__
+#ifndef __PRIMITIVES_SHADERS_H__
+#define __PRIMITIVES_SHADERS_H__
 
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>

@@ -1,20 +1,16 @@
 #ifndef __RENDER_CTX_H__
 #define __RENDER_CTX_H__
 
-#define MAX_OBJECTS 100
 
 typedef struct {
-    float xPos[MAX_OBJECTS];
-    float yPos[MAX_OBJECTS];
-    float xSize[MAX_OBJECTS];
-    float ySize[MAX_OBJECTS];
-    int objectCount;
-} RenderList_t;
+    unsigned int PID;
+    unsigned int VAO;
+} RenderCtx_t;
 
-
+extern RenderCtx_t rCtx;
 
 void initCtx(void);
-void drawList(void);
+void drawLoop(void);
 
 
 #endif

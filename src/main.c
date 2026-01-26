@@ -1,30 +1,18 @@
 #include "window/wnd.h"
 #include "render/ctx.h"
-#include <stdlib.h>
+#include "util/err.h"
 
 
 int main(void){
-
     if (createWindow()){
         return -1;
     }
 
 
-    GLFWwindow* window = mainWindow->window;
-
     initCtx();
     
-    while(!glfwWindowShouldClose(window)){
-        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        
-        drawList();
-
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }    
+    drawLoop();
 
     closeWindow();
-
-    // printErrLog();
+    printErrLog();
 }

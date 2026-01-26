@@ -1,5 +1,5 @@
-#ifndef __PRIMITIVE_H__
-#define __PRIMITIVE_H__
+#ifndef __PRIMITIVES_VERTEX_H__
+#define __PRIMITIVES_VERTEX_H__
 
 #include "glad/glad.h"
 #include <glfw/glfw3.h>
