@@ -6,19 +6,23 @@
 #include <glfw/glfw3.h>
 
 #include "draw.h"
-#include "camera.h"
-#include "scene.h"
+
+#include "common/types.h"
 
 #include "primitives/shaders.h"
 #include "primitives/vertex.h"
 #include "window/wnd.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 RenderCtx_t rCtx = {0};
 
 
 void initCtx(void){
+    if (createWindow()){
+        exit(-1);
+    }
     rCtx.PID = initShaders();
     rCtx.VAO = createPrimitive(PRIM_SQUARE);
 
@@ -31,34 +35,27 @@ void initCtx(void){
     initScene(initFOV);
 }
 
-void drawStep(void){
-    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+void clearBuffers(void){
+    glClearColor(
+        rCtx.camera->bgColor[0], 
+        rCtx.camera->bgColor[1], 
+        rCtx.camera->bgColor[2], 
+        rCtx.camera->bgColor[3]
+    );
     glClear(GL_COLOR_BUFFER_BIT);
-    
-    glUseProgram(rCtx.PID);
-    glBindVertexArray(rCtx.VAO);
-
-    setPerspective(rCtx.PID);
-
-    drawScene();
-
-    glBindVertexArray(0);
-
-    glfwSwapBuffers(mainWindow->window);
-    glfwPollEvents();
 }
+
 
 void draw(void){
     while(!glfwWindowShouldClose(mainWindow->window)){
-        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        clearBuffers();
         
         glUseProgram(rCtx.PID);
         glBindVertexArray(rCtx.VAO);
 
         setPerspective(rCtx.PID);
         
-        drawScene();
+        renderObjects();
         
         glBindVertexArray(0);
 

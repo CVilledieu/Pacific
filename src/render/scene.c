@@ -1,4 +1,6 @@
 #include "scene.h"
+#include "draw.h"
+#include "common/error.h"
 
 #include "glad/glad.h"
 #include <glfw/glfw3.h>
@@ -6,85 +8,88 @@
 #include <stdio.h>
 
 
-int nObjects = 0;
-Vec2 sceneEdge = {0, 0}; 
-Scene_t scene = {0};
+Vec2 stage = {0, 0};
+Objects_t list = {0}; 
+static int oCount = 0;
 
 
-int newObject(Vec2 pos, Vec2 size, Vec2 velocity);
-
-void setPos(int id, Vec2 value);
-void setSize(int id, Vec2 value);
-void setVelocity(int id, Vec2 value);
-void getSceneEdge(Vec2 worldScale);
-
-// DevNote: Currently has staticly created objects for debugging / dev purposes
-void initScene(Vec2 worldScale){
-
-    getSceneEdge(worldScale);
-
-    newObject((Vec2){-4.2f, 1.0f}, (Vec2){1.0f, 1.0f}, (Vec2){0.07f, 0.06f} );
-    newObject((Vec2){4.5f, -1.0f}, (Vec2){1.0f, 1.0f}, (Vec2){0.1f, 0.09f} );
-    newObject((Vec2){4.0f, -2.0f}, (Vec2){1.0f, 1.0f}, (Vec2){0.1f, 0.099f} );
-    newObject((Vec2){3.0f, -1.5f}, (Vec2){1.0f, 1.0f}, (Vec2){0.1f, 0.09f} );
+// Render piple always results in a number between -1 and 1, so
+// Dividing 1 by the perspective scaler gets the window boundaries into model coordinates 
+void setStageSize(Vec2 worldScale){
+    stage[X] = (1 / worldScale[X]);
+    stage[Y] = (1 / worldScale[Y]);
 }
 
-
-int newObject(Vec2 pos, Vec2 size, Vec2 velocity){
-    int newID = scene.objCount;
-
-    if (newID > MAX_OBJECTS) return 1;
-    
-    setPos(newID, pos);
-    setSize(newID, size);
-    setVelocity(newID, velocity);
-
-    scene.objCount++;
-}
-
-void updateScene(void){
-    for (int id = 0; id < scene.objCount; id++){
-        scene.xPos[id] += scene.xVel[id];
-        scene.yPos[id] += scene.yVel[id];
+// Updates xPos and yPos seperately to take advantage of SoA approach
+void moveSceneObjects(void){
+    for (int id = 0; id < oCount; id++){
+        float newPos = list.xPos[id] + list.xVel[id];
+        if (newPos >= stage[X]){
+            list.xPos[id] = stage[X];
+            list.xVel[id] *= -1;
+        } else if (newPos <= -stage[X]){
+            list.xPos[id] = -stage[X];
+            list.xVel[id] *= -1;
+        } else {
+            list.xPos[id] = newPos;
+        }
     }
+
+    for (int id = 0; id < oCount; id++){
+        float newPos = list.yPos[id] + list.yVel[id];
+        if (newPos >= stage[Y]){
+            list.yPos[id] = stage[Y];
+            list.yVel[id] *= -1;
+        } else if (newPos <= -stage[Y]){
+            list.yPos[id] = -stage[Y];
+            list.yVel[id] *= -1;
+        } else {
+           list. yPos[id] = newPos;
+        }
+    }
+
 }
 
-void checkEdgeCollision(int id){
-    // Check if boundary was hit
-    // If boundary is hit. Sets pos to boundary value and reverse direction
-    if (scene.xPos[id] >= sceneEdge[xCoord]){
-        scene.xPos[id] = sceneEdge[xCoord];
-        scene.xVel[id] *= -1.0f;
+
+Err newObject(Vec2 pos, Vec2 size, Vec2 velocity){
+    int newID = oCount;
+    if (newID > MAX_OBJECTS) return E_OUT_OF_MEMORY;
+
+    list.xPos[newID] = pos[X];
+    list.yPos[newID] = pos[Y];
+
+    list.xSize[newID] = size[X];
+    list.ySize[newID] = size[Y];
         
-    }else if (scene.xPos[id] <= -sceneEdge[xCoord]){
-        scene.xPos[id] = (sceneEdge[xCoord] * -1);
-        scene.xVel[id] *= -1.0f;
+    list.xVel[newID] = velocity[X];
+    list.yVel[newID] = velocity[Y];
+
+    oCount++;
+
+    return E_SUCCESS;
+}
+
+//Only checking 1 result right now. Since object creation is static and uniform, if one fail all would fail
+void loadObjects(void){
+    Vec2 obj1[3] = {{-4.2f, -1.0f}, {1.0f, 1.0f}, {0.07f, 0.06f}};
+    Vec2 obj2[3] = {{-0.5f, 1.0f}, {1.0f, 1.0f}, {0.07f, 0.06f}};
+    Vec2 obj3[3] = {{4.0f, 1.0f}, {1.0f, 1.0f}, {0.07f, 0.06f}};
+    Vec2 obj4[3] = {{3.0f, -1.0f}, {1.0f, 1.0f}, {0.07f, 0.06f}};
+    int res = 0;
+    res = newObject(obj1[0], obj1[1], obj1[2]);
+    if (res != 0){
+        logErr(res, "Failed to create obj");
     }
 
-    if (scene.yPos[id] >= sceneEdge[yCoord]){
-        scene.yPos[id] = sceneEdge[yCoord];
-        scene.yVel[id] *= -1.0f;
-    }else if (scene.yPos[id] <= -sceneEdge[yCoord]){
-        scene.yPos[id] = (sceneEdge[yCoord] * -1);
-        scene.yVel[id] *= -1.0f;
-    }
+    newObject(obj2[0], obj2[1], obj2[2]);
+    newObject(obj3[0], obj3[1], obj3[2]);
+    newObject(obj4[0], obj4[1], obj4[2]);
 }
 
-void setPos(int id, Vec2 value){
-    scene.xPos[id] = value[xCoord];
-    scene.yPos[id] = value[yCoord];
-}
 
-void setVelocity(int id, Vec2 value){
-    scene.xVel[id] = value[xCoord];
-    scene.yVel[id] = value[yCoord];
-}
+int flushScene(void){
 
-void setSize(int id, Vec2 value){
-    scene.xSize[id] = value[xCoord];
-    scene.ySize[id] = value[yCoord];
 }
-
 
 
 // Model's matrix is handled differently than the Perspective matrix
@@ -97,30 +102,31 @@ void setModelMatrix(int index){
         0.0f, 0.0f, 1.0f, 0.0f,
         0.0f, 0.0f, 0.0f, 1.0f,
     };
-    mat4[0] = scene.xSize[index];
-    mat4[5] = scene.ySize[index];
 
-    mat4[12] = scene.xPos[index];
-    mat4[13] = scene.yPos[index];
+    mat4[0] = list.xSize[index];
+    mat4[5] = list.ySize[index];
+
+    mat4[12] = list.xPos[index];
+    mat4[13] = list.yPos[index];
+
     unsigned int uniformLoc = glGetUniformLocation(rCtx.PID, "uModel");
     glUniformMatrix4fv(uniformLoc, 1, GL_FALSE, mat4);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
 
-void drawScene(void){
-    for (int i = 0; i < scene.objCount; i++){
-        setModelMatrix(i);
-        
-
-        moveObject(i);
+// DevNote: broke off from drawScene, for more customize ablity with both
+void renderObjects(void){
+    moveSceneObjects();
+    for (int i = 0; i < oCount; i++){
+        setModelMatrix(i);   
     }
-
 }
 
-// Render piple always results in a number between -1 and 1, so
-// Dividing 1 by the perspective scaler gets the window boundaries into model coordinates 
-void getSceneEdge(Vec2 worldScale){
-    sceneEdge[xCoord] = (1 / worldScale[xCoord]);
-    sceneEdge[yCoord] = (1 / worldScale[yCoord]);
+
+// DevNote: Currently has staticly created objects for debugging / dev purposes
+void initScene(Vec2 cameraScale){
+    setStageSize(cameraScale);
+    loadObjects();
+
 }

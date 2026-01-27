@@ -1,18 +1,14 @@
-#include "window/wnd.h"
 #include "render/draw.h"
-#include "util/err.h"
-
+#include "common/error.h"
+#include "window/wnd.h"
 
 int main(void){
-    if (createWindow()){
-        return -1;
-    }
 
 
     initCtx();
     
     draw();
 
-    closeWindow();
     printErrLog();
+    closeWindow();
 }

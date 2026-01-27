@@ -4,8 +4,6 @@
 #include <glfw/glfw3.h>
 
 
-
-
 static enum {
     SCALE_W = 0,
     SCALE_H = 5,
@@ -13,16 +11,17 @@ static enum {
     MOVE_Y = 13,
 } ViewIndex_e;
 
-Camera_t camera = {0};
+Camera_t camera = {
+    .bgColor = (Vec4){0.2f, 0.2f, 0.2f, 1.0f},
+};
 
 static void updateFOV(int index, float newValue);
 
 Camera_t* initCamera(Vec2 initFOV){
-    camera.fov[xCoord] = initFOV[xCoord],
-    camera.fov[yCoord] = initFOV[yCoord],
-    updateFOV(SCALE_H, camera.fov[yCoord]);
-    updateFOV(SCALE_W, camera.fov[xCoord]);
-
+    camera.fov[X] = initFOV[X],
+    camera.fov[Y] = initFOV[Y],
+    updateFOV(SCALE_H, camera.fov[Y]);
+    updateFOV(SCALE_W, camera.fov[X]);
     return &camera;
 }
 
@@ -43,6 +42,3 @@ void setPerspective(unsigned int shaderPID){
 static void updateFOV(int index, float newValue){
     ViewMatrix[index] = newValue;
 }
-
-
-

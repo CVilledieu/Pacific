@@ -1,12 +1,12 @@
 #ifndef __RENDER_SCENE_H__
 #define __RENDER_SCENE_H__
 
-#include "draw.h"
+#include "common/types.h"
 
 #define MAX_OBJECTS 100
 
 // SoA approach to organizing object data
-typedef struct Scene_t{
+typedef struct Objects_t {
     float xPos[MAX_OBJECTS];
     float yPos[MAX_OBJECTS];
 
@@ -15,11 +15,16 @@ typedef struct Scene_t{
 
     float xSize[MAX_OBJECTS];
     float ySize[MAX_OBJECTS];
-    int objCount;
-} Scene_t;
+} Objects_t;
 
-void initScene(Vec2 initBounds);
 
-void drawScene(void);
+// typedef struct Scene_t{
+//     int oCount;
+// } Scene_t;
+
+
+void initScene(Vec2 cameraScale);
+
+void renderObjects(void);
 
 #endif
