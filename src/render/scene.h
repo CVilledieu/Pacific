@@ -1,12 +1,12 @@
-#ifndef __OBJECTS_MODELS_H__
-#define __OBJECTS_MODELS_H__
+#ifndef __RENDER_SCENE_H__
+#define __RENDER_SCENE_H__
 
-#include "render/ctx.h"
+#include "draw.h"
 
 #define MAX_OBJECTS 100
 
 // SoA approach to organizing object data
-typedef struct Objects_t{
+typedef struct Scene_t{
     float xPos[MAX_OBJECTS];
     float yPos[MAX_OBJECTS];
 
@@ -15,10 +15,11 @@ typedef struct Objects_t{
 
     float xSize[MAX_OBJECTS];
     float ySize[MAX_OBJECTS];
-} Objects_t;
+    int objCount;
+} Scene_t;
 
-void initObjects(float x, float y);
+void initScene(Vec2 initBounds);
 
-void drawModels(void);
+void drawScene(void);
 
 #endif

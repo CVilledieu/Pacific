@@ -1,5 +1,5 @@
 #include "window/wnd.h"
-#include "render/ctx.h"
+#include "render/draw.h"
 #include "util/err.h"
 
 
@@ -11,7 +11,7 @@ int main(void){
 
     initCtx();
     
-    drawLoop();
+    draw();
 
     closeWindow();
     printErrLog();

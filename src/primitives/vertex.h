@@ -7,7 +7,7 @@
 
 typedef enum {
     PRIM_SQUARE,
-    PRIM_TRIANGLE,
+    PRIM_CIRCLE,
 } primType;
 
 unsigned int createPrimitive(primType type);
