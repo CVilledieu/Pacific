@@ -1,5 +1,6 @@
 #include "wnd.h"
 #include <stdlib.h>
+#include "common/error.h"
 
 Wnd* mainWindow;
 
@@ -62,6 +63,10 @@ void closeWindow(void){
     if (mainWindow->window) {
         glfwDestroyWindow(mainWindow->window);
     }
+
+    #ifdef DEBUG_MODE
+        printErrLog();
+    #endif
     glfwTerminate();
 }
 

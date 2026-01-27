@@ -17,6 +17,8 @@ typedef struct Objects_t {
     float ySize[MAX_OBJECTS];
 } Objects_t;
 
+typedef Vec2 ObjectData[3];
+
 
 // typedef struct Scene_t{
 //     int oCount;

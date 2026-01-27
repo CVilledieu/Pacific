@@ -3,12 +3,9 @@
 #include "window/wnd.h"
 
 int main(void){
-
-
     initCtx();
     
     draw();
 
-    printErrLog();
     closeWindow();
 }

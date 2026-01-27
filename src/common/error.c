@@ -12,9 +12,9 @@ void logErr(Err err,  const char* msg){
     if (errCount >= 1024){
         return;
     }
-
     errLog[errCount].eType = err;
     strcpy(errLog[errCount].msg, msg);
+    errCount++;
 }
 
 
@@ -25,6 +25,10 @@ const char* CodeStrings[] = {
 };
 
 void printErrLog(void){
+    if (errCount == 0){
+        printf("No errs");
+        return;
+    }
     for (int i = 0; i < errCount; i++){
         printf("Err type: %s\n Err msg: %s \n", CodeStrings[errLog[i].eType], errLog[i].msg);
     }

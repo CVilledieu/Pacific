@@ -7,6 +7,13 @@
 
 #include <stdio.h>
 
+ObjectData tempObjs[4] = {
+    {{-4.2f, -1.0f}, {1.0f, 1.0f}, {0.07f, 0.06f}},
+    {{-0.5f, 1.0f}, {1.0f, 1.0f}, {0.07f, 0.06f}},
+    {{4.0f, 1.0f}, {1.0f, 1.0f}, {0.07f, 0.06f}},
+    {{3.0f, -1.0f}, {1.0f, 1.0f}, {0.07f, 0.06f}},
+};
+
 
 Vec2 stage = {0, 0};
 Objects_t list = {0}; 
@@ -51,7 +58,7 @@ void moveSceneObjects(void){
 }
 
 
-Err newObject(Vec2 pos, Vec2 size, Vec2 velocity){
+Err setObject(Vec2 pos, Vec2 size, Vec2 velocity){
     int newID = oCount;
     if (newID > MAX_OBJECTS) return E_OUT_OF_MEMORY;
 
@@ -70,20 +77,13 @@ Err newObject(Vec2 pos, Vec2 size, Vec2 velocity){
 }
 
 //Only checking 1 result right now. Since object creation is static and uniform, if one fail all would fail
-void loadObjects(void){
-    Vec2 obj1[3] = {{-4.2f, -1.0f}, {1.0f, 1.0f}, {0.07f, 0.06f}};
-    Vec2 obj2[3] = {{-0.5f, 1.0f}, {1.0f, 1.0f}, {0.07f, 0.06f}};
-    Vec2 obj3[3] = {{4.0f, 1.0f}, {1.0f, 1.0f}, {0.07f, 0.06f}};
-    Vec2 obj4[3] = {{3.0f, -1.0f}, {1.0f, 1.0f}, {0.07f, 0.06f}};
-    int res = 0;
-    res = newObject(obj1[0], obj1[1], obj1[2]);
-    if (res != 0){
-        logErr(res, "Failed to create obj");
+void loadObjects(ObjectData* data, int num){
+    for (int i = 0; i < num; i++){
+        int res = setObject(data[i][0], data[i][1], data[i][2]);
+        if (res != 0){
+            logErr(res, "Failed to load object from data");
+        }
     }
-
-    newObject(obj2[0], obj2[1], obj2[2]);
-    newObject(obj3[0], obj3[1], obj3[2]);
-    newObject(obj4[0], obj4[1], obj4[2]);
 }
 
 
@@ -127,6 +127,6 @@ void renderObjects(void){
 // DevNote: Currently has staticly created objects for debugging / dev purposes
 void initScene(Vec2 cameraScale){
     setStageSize(cameraScale);
-    loadObjects();
+    loadObjects(tempObjs, 4);
 
 }
