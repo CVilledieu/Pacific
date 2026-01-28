@@ -17,6 +17,8 @@ typedef struct Objects_t {
     float ySize[MAX_OBJECTS];
 } Objects_t;
 
+// Not to be used to store Object data.
+// Should only be used as a template in the creation or loading of an Object
 typedef Vec2 ObjectData[3];
 
 
@@ -26,7 +28,8 @@ typedef Vec2 ObjectData[3];
 
 
 void initScene(Vec2 cameraScale);
+int flushScene(void);
 
-void renderObjects(void);
+void drawScene(unsigned int PID);
 
 #endif

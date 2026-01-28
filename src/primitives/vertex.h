@@ -8,9 +8,9 @@
 typedef enum {
     PRIM_SQUARE,
     PRIM_CIRCLE,
-} primType;
+} PrimType;
 
-unsigned int createPrimitive(primType type);
+unsigned int createPrimitive(PrimType type);
 void deleteBufferObjects(void);
 
 

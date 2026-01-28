@@ -7,14 +7,12 @@
 typedef struct {
     unsigned int PID;
     unsigned int VAO;
-    Camera_t* camera;
+    Vec4 bgColor;
 } RenderCtx_t;
 
 extern RenderCtx_t rCtx;
 
-
 void initCtx(void);
 void draw(void);
-
 
 #endif

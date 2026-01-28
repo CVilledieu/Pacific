@@ -95,7 +95,7 @@ unsigned int createCircle_VAO(void){
     return VAO;
 }
 
-unsigned int createPrimitive(primType type){
+unsigned int createVertexObject(PrimType type){
     switch(type){
         case PRIM_SQUARE:
             return createSquare_VAO();

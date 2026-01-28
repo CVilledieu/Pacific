@@ -1,7 +1,3 @@
-// Main Ctx for the engine
-// will likely switch names of: `render/ -> context/` 
-
-
 #include "glad/glad.h"
 #include <glfw/glfw3.h>
 
@@ -11,51 +7,46 @@
 
 #include "primitives/shaders.h"
 #include "primitives/vertex.h"
-#include "window/wnd.h"
+#include "primitives/wnd.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 
-RenderCtx_t rCtx = {0};
+// Originally had a struct based approach, but most felt like they were in the way or almost pointless. 
+
+RenderCtx_t rCtx = {
+    .bgColor = (Vec4){0.2f, 0.2f, 0.2f, 1.0f},
+};
 
 
 void initCtx(void){
     if (createWindow()){
         exit(-1);
     }
-    rCtx.PID = initShaders();
+    initShaders();
     rCtx.VAO = createPrimitive(PRIM_SQUARE);
 
-    // DevNote: Passing initial fov to camera for 2 reasons. 
-    // Later, I can have the initial FOV as a parameter for initCtx. Allowing more customizablity
-    // Also feels smoother pass the same Vec to both camera and scene rather than passing scene a property of camera
     Vec2 initFOV = {0.09f, 0.09f}; 
-    rCtx.camera = initCamera(initFOV);
-
+    initCamera(initFOV);
     initScene(initFOV);
-}
-
-void clearBuffers(void){
-    glClearColor(
-        rCtx.camera->bgColor[0], 
-        rCtx.camera->bgColor[1], 
-        rCtx.camera->bgColor[2], 
-        rCtx.camera->bgColor[3]
-    );
-    glClear(GL_COLOR_BUFFER_BIT);
 }
 
 
 void draw(void){
+    glUseProgram(rCtx.PID);
     while(!glfwWindowShouldClose(mainWindow->window)){
-        clearBuffers();
+        glClearColor(
+            rCtx.bgColor[0], 
+            rCtx.bgColor[1], 
+            rCtx.bgColor[2], 
+            rCtx.bgColor[3]
+        );
+        glClear(GL_COLOR_BUFFER_BIT);
         
-        glUseProgram(rCtx.PID);
         glBindVertexArray(rCtx.VAO);
 
-        setPerspective(rCtx.PID);
+        setPerspective();
         
-        renderObjects();
+        drawScene();
         
         glBindVertexArray(0);
 
@@ -63,6 +54,3 @@ void draw(void){
         glfwPollEvents();
     }    
 }
-
-
-

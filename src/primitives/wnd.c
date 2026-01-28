@@ -70,3 +70,6 @@ void closeWindow(void){
     glfwTerminate();
 }
 
+int keepDrawing(void){
+    return !glfwWindowShouldClose(mainWindow->window);
+}

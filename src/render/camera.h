@@ -3,14 +3,9 @@
 
 #include "common/types.h"
 
-typedef struct Camera_t{
-    Vec2 fov;
-    Vec4 bgColor;
-} Camera_t;
 
+void initCamera(Vec2 initFOV);
 
-Camera_t* initCamera(Vec2 initFOV);
-
-void setPerspective(unsigned int shaderPID);
+void setPerspective();
 
 #endif

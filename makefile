@@ -2,7 +2,7 @@ CC = gcc
 TARGET = bin/pacific.exe
 
 INC = -I./src -I./include
-CFLAGS = -Wall -Wextra $(INC) -DDEBUG_MODE
+CFLAGS = -Wall -Wextra $(INC) 
 LDFLAGS = -lglfw3 -lopengl32 -lgdi32 -luser32 -lkernel32 -lm
 
 
@@ -34,9 +34,12 @@ purge:
 clean:
 	@rm -rf bin/*.o bin/*/
 
-
 # Compiles and runs the program for faster development
 run: all
 	cd bin && ./pacific.exe
+
+debug: 
+	$(CFLAGS) += -DDEBUG_MODE=1 
+	run
 
 .PHONY: all clean run purge migrate debug

@@ -12,6 +12,15 @@
 #define VERTEX_FILE "default.vert" 
 #define FRAG_FILE "default.frag"
 
+static unsigned int shaderPID = 0;
+
+// static Shader_t basicShader = {
+//     .id = 0,
+//     .uCount = 2,
+//     .uNames = {"uModel", "uView"},
+//     .uLocs = {0,0},
+// };
+
 
 static unsigned int compileShader(const char* shaderName, GLenum shaderType){
     char path[256];
@@ -49,17 +58,26 @@ static unsigned int compileShader(const char* shaderName, GLenum shaderType){
     return shader;
 }
 
-unsigned int initShaders(void){
+void initShaders(void){
     unsigned int vertexShader = compileShader(VERTEX_FILE, GL_VERTEX_SHADER);
     unsigned int fragmentShader = compileShader(FRAG_FILE, GL_FRAGMENT_SHADER);
 
-    unsigned int shaderPID = glCreateProgram();
-    glAttachShader(shaderPID, vertexShader);
-    glAttachShader(shaderPID, fragmentShader);
-    glLinkProgram(shaderPID);
+    unsigned int ShaderPID  = glCreateProgram();
+    glAttachShader(ShaderPID , vertexShader);
+    glAttachShader(ShaderPID, fragmentShader);
+    glLinkProgram(ShaderPID );
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    return shaderPID;
+    glUseProgram(ShaderPID); 
+    return ShaderPID;
+}
+
+void setProgramID(void){
+    glUseProgram(shaderPID);
+}
+
+unsigned int getUniformLoc(char* name){
+    return glGetUniformLocation(shaderPID, name);
 }

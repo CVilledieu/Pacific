@@ -8,10 +8,10 @@
 #include <stdio.h>
 
 ObjectData tempObjs[4] = {
-    {{-4.2f, -1.0f}, {1.0f, 1.0f}, {0.07f, 0.06f}},
-    {{-0.5f, 1.0f}, {1.0f, 1.0f}, {0.07f, 0.06f}},
-    {{4.0f, 1.0f}, {1.0f, 1.0f}, {0.07f, 0.06f}},
-    {{3.0f, -1.0f}, {1.0f, 1.0f}, {0.07f, 0.06f}},
+    {{-4.2f, -1.0f}, {4.2f, 1.0f}, {0.02f, 0.01f}},
+    {{-0.5f, 1.0f}, {1.0f, 1.0f}, {0.02f, 0.01f}},
+    {{4.0f, 1.0f}, {1.0f, 3.0f}, {0.02f, 0.01f}},
+    {{3.0f, -1.0f}, {1.0f, 1.0f}, {0.02f, 0.01f}},
 };
 
 
@@ -28,14 +28,15 @@ void setStageSize(Vec2 worldScale){
 }
 
 // Updates xPos and yPos seperately to take advantage of SoA approach
-void moveSceneObjects(void){
+void updateScenePos(void){
     for (int id = 0; id < oCount; id++){
         float newPos = list.xPos[id] + list.xVel[id];
-        if (newPos >= stage[X]){
-            list.xPos[id] = stage[X];
+        float outOfBounds = stage[X] - (list.xSize[id]/2);
+        if (newPos >= outOfBounds){
+            list.xPos[id] = outOfBounds;
             list.xVel[id] *= -1;
-        } else if (newPos <= -stage[X]){
-            list.xPos[id] = -stage[X];
+        } else if (newPos <= -outOfBounds){
+            list.xPos[id] = -outOfBounds;
             list.xVel[id] *= -1;
         } else {
             list.xPos[id] = newPos;
@@ -44,11 +45,12 @@ void moveSceneObjects(void){
 
     for (int id = 0; id < oCount; id++){
         float newPos = list.yPos[id] + list.yVel[id];
-        if (newPos >= stage[Y]){
-            list.yPos[id] = stage[Y];
+        float outOfBounds = stage[Y] - (list.ySize[id]/2);
+        if (newPos >= outOfBounds){
+            list.yPos[id] = outOfBounds;
             list.yVel[id] *= -1;
-        } else if (newPos <= -stage[Y]){
-            list.yPos[id] = -stage[Y];
+        } else if (newPos <= -outOfBounds){
+            list.yPos[id] = -outOfBounds;
             list.yVel[id] *= -1;
         } else {
            list. yPos[id] = newPos;
@@ -95,31 +97,46 @@ int flushScene(void){
 // Model's matrix is handled differently than the Perspective matrix
 // An identity matrix is initialized each time function is called, so no artifacts are left from other models.
 // This way the amount of memory used is not linear with the number of objects
-void setModelMatrix(int index){
-    float mat4[16] = {
-        1.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f,
-    };
+// TEMP: moved into drawScene for simplicty and to be able to pass Program ID easier
+// void setModelMatrix(int index){
+//     float mat4[16] = {
+//         1.0f, 0.0f, 0.0f, 0.0f,
+//         0.0f, 1.0f, 0.0f, 0.0f,
+//         0.0f, 0.0f, 1.0f, 0.0f,
+//         0.0f, 0.0f, 0.0f, 1.0f,
+//     };
 
-    mat4[0] = list.xSize[index];
-    mat4[5] = list.ySize[index];
+//     mat4[0] = list.xSize[index];
+//     mat4[5] = list.ySize[index];
 
-    mat4[12] = list.xPos[index];
-    mat4[13] = list.yPos[index];
+//     mat4[12] = list.xPos[index];
+//     mat4[13] = list.yPos[index];
 
-    unsigned int uniformLoc = glGetUniformLocation(rCtx.PID, "uModel");
-    glUniformMatrix4fv(uniformLoc, 1, GL_FALSE, mat4);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-}
+//     unsigned int uniformLoc = glGetUniformLocation(rCtx.PID, "uModel");
+//     glUniformMatrix4fv(uniformLoc, 1, GL_FALSE, mat4);
+//     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+// }
 
 
-// DevNote: broke off from drawScene, for more customize ablity with both
-void renderObjects(void){
-    moveSceneObjects();
+void drawScene(unsigned int uniformLoc){
+    updateScenePos();
+
     for (int i = 0; i < oCount; i++){
-        setModelMatrix(i);   
+        float mat4[16] = {
+            1.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f,
+        };
+
+        mat4[0] = list.xSize[i];
+        mat4[5] = list.ySize[i];
+
+        mat4[12] = list.xPos[i];
+        mat4[13] = list.yPos[i];
+
+        glUniformMatrix4fv(uniformLoc, 1, GL_FALSE, mat4);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);   
     }
 }
 
