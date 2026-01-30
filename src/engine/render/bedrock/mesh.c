@@ -1,18 +1,17 @@
-#include "vertex.h"
+#include "foundation.h"
+#include "engine/common/types.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 
-static unsigned int VBO, EBO;
-
-unsigned int createSquare_VAO(void){
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);
+static void squareMesh(Mesh_t* mesh){
+    unsigned int VBO, EBO;
+    glGenVertexArrays(1, &mesh->VO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
 
-    glBindVertexArray(VAO);
+    glBindVertexArray(mesh->VO);
     
     float vertices[] = {
         -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 1.0f, // Top Left
@@ -28,6 +27,8 @@ unsigned int createSquare_VAO(void){
         0, 1, 2, 
         3, 2, 1,
     };
+
+    mesh->indices = (sizeof(drawOrder) / sizeof(unsigned int));
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(drawOrder), drawOrder, GL_STATIC_DRAW);
     
@@ -39,16 +40,15 @@ unsigned int createSquare_VAO(void){
     glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
-    return VAO;
 }
 
-unsigned int createCircle_VAO(void){
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);
+static void circleMesh(Mesh_t* mesh){
+    unsigned int VBO, EBO;
+    glGenVertexArrays(1, &mesh->VO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
 
-    glBindVertexArray(VAO);
+    glBindVertexArray(mesh->VO);
     
 
     float vertices[] = {
@@ -81,6 +81,7 @@ unsigned int createCircle_VAO(void){
         0, 7, 8,
         0, 8, 1,
     };
+    mesh->indices = (sizeof(drawOrder) / sizeof(unsigned int));
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(drawOrder), drawOrder, GL_STATIC_DRAW);
     
@@ -92,23 +93,32 @@ unsigned int createCircle_VAO(void){
     glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
-    return VAO;
 }
 
-unsigned int createVertexObject(PrimType type){
-    switch(type){
-        case PRIM_SQUARE:
-            return createSquare_VAO();
-        case PRIM_CIRCLE:
-            return createCircle_VAO();
-        default:
-            return 0;
-    }
+void createMeshes(Mesh_t* meshes){
+    squareMesh(&meshes[SQUARE]);
+    circleMesh(&meshes[CIRCLE]);
     
 }
 
-void deleteBufferObjects(void){
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
+void cleanUpMeshes(Mesh_t* meshes){
+    for (int i = 0; i < TOTAL_MESH_BASES; i++){
+        glDeleteVertexArrays(1, &meshes[i].VO);
+    }
+}
+
+
+unsigned int createTransformSSBO(void){
+    unsigned int ssbo;
+    glGenBuffers(1, &ssbo);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, 
+                 MAX_MODEL_COUNT * 4 * sizeof(float), 
+                 NULL, 
+                 GL_DYNAMIC_DRAW);
+    // Bind to binding point 0 (matches shader layout)
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    return ssbo;
 }
 

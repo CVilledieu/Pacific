@@ -4,3 +4,4 @@ bin/
 
 # NON PUBLIC
 internal/
+.github/
