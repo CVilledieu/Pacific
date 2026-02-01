@@ -1,7 +1,7 @@
 #ifndef __ENTITIES_H__
 #define __ENTITIES_H__
 
-#include "engine/common/types.h"
+#include "engine/types.h"
 
 int addEntity(EntityList_t* cast, Vec2 pos, Vec2 size, Vec2 speed);
 

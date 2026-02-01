@@ -1,4 +1,6 @@
 #include "camera.h"
+#include "glad/glad.h"
+#include <GLFW/glfw3.h>
 
 #include <string.h>
 
@@ -50,4 +52,14 @@ void moveCamera(Camera_t camera, Vec3 move){
     camera[12] = move[X];   // Translate X
     camera[13] = move[Y];   // Translate Y
     camera[14] = move[Z];   // Translate Z
+}
+
+// Temp unused awaiting future need for functionality. Plans: scale camera constants based on window sizing.
+// At the moment objects grow linearly with the size of the window, but I will likely want to change that to a slower rate 
+void updatedWindowSize(GLFWwindow* window, int width, int height){
+    glViewport(0, 0, width, height);
+}
+
+void initCamera(GLFWwindow* window){
+    glfwSetFramebufferSizeCallback(window, updatedWindowSize);
 }

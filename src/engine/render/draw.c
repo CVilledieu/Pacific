@@ -1,7 +1,7 @@
 #include "draw.h"
 #include "bedrock/foundation.h"
 
-#include "engine/common/types.h"
+#include "engine/types.h"
 
 typedef enum {
     dW = 0,

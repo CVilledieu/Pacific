@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 
+
 int addEntity(EntityList_t* cast, Vec2 pos, Vec2 size, Vec2 speed){
     int entityId = cast->count;
     if(entityId >= MAX_MODEL_COUNT) {
@@ -14,8 +15,8 @@ int addEntity(EntityList_t* cast, Vec2 pos, Vec2 size, Vec2 speed){
     cast->width[entityId] = size[X];
     cast->height[entityId] = size[Y];
 
-    cast->xV[entityId] = speed[X];
-    cast->yV[entityId] = speed[Y];
+    cast->dX[entityId] = speed[X];
+    cast->dY[entityId] = speed[Y];
     cast->count++;
     return entityId;
 }

@@ -4,7 +4,7 @@
 #include "GLAD/glad.h"
 #include <GLFW/glfw3.h>
 
-#include "engine/common/types.h"
+#include "engine/types.h"
 // Window
 // =========
 GLFWwindow* createWindow(void);

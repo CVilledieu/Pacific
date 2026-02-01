@@ -1,7 +1,7 @@
 #ifndef __DIRECTOR_H__
 #define __DIRECTOR_H__
 
-#include "common/types.h"
+#include "types.h"
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
 

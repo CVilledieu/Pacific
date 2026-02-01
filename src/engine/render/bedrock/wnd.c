@@ -2,14 +2,11 @@
 #include <stdlib.h>
 #include "common/error.h"
 
-// Currently listening for:
-// - ESC key to close the window
-void callback_key(GLFWwindow* window, int key, int scancode, int action, int mods){
-    (void)scancode;
-    (void)mods;
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
-}
+
+// typedef struct ControlScheme_t {
+//     int key;
+//     void* funcPtr;
+// } ControlScheme_t;
 
 void callback_wndSize_Update(GLFWwindow* window, int width, int height){
     (void)window;
@@ -30,7 +27,7 @@ GLFWwindow* createWindow(void){
     #endif
 
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "IslandTap Engine", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(800, 600, "Pacific Engine", NULL, NULL);
     if (!window) {
         glfwTerminate();
         return NULL;
@@ -44,8 +41,11 @@ GLFWwindow* createWindow(void){
         return NULL;
     }
 
-    glfwSetKeyCallback(window, callback_key);
     glfwSetFramebufferSizeCallback(window, callback_wndSize_Update);
     return window;
 }
+
+
+
+
 
