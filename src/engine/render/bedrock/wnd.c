@@ -3,12 +3,7 @@
 #include "common/error.h"
 
 
-// typedef struct ControlScheme_t {
-//     int key;
-//     void* funcPtr;
-// } ControlScheme_t;
-
-void callback_wndSize_Update(GLFWwindow* window, int width, int height){
+void updatedWindowSize(GLFWwindow* window, int width, int height){
     (void)window;
     glViewport(0, 0, width, height);
 }
@@ -48,7 +43,7 @@ GLFWwindow* createWindow(void){
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 
-    glfwSetFramebufferSizeCallback(window, callback_wndSize_Update);
+    glfwSetFramebufferSizeCallback(window, updatedWindowSize);
     return window;
 }
 

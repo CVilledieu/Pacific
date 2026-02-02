@@ -5,6 +5,6 @@
 
 GLFWwindow* initRenderData(void);
 
-void draw(ECS_t* ecs, Mat4 camera);
+void draw(ECS_t* ecs);
 
 #endif

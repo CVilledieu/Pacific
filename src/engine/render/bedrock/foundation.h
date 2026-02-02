@@ -7,9 +7,7 @@
 #include "engine/types.h"
 
 
-// Each instance stores a full mat4 model matrix (16 floats, computed on CPU)
-#define FLOATS_PER_INSTANCE 16
-#define TRANSFORM_BUFFER_SIZE (MAX_MODEL_COUNT * FLOATS_PER_INSTANCE * sizeof(float))
+#define TRANSFORM_BUFFER_SIZE (MAX_MODEL_COUNT * 4 * sizeof(float))
 
 // Window
 // =========

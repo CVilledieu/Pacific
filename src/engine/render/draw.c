@@ -8,6 +8,13 @@ static GLFWwindow* window = NULL;
 static unsigned int uView = 0;
 static Mesh_t mesh = {0};
 
+static float defaultCamera[16] = {
+    1.0f, 0.0f, 0.0f, 0.0f,
+    0.0f, 1.0f, 0.0f, 0.0f,
+    0.0f, 0.0f, 1.0f, 0.0f,
+    0.0f, 0.0f, 0.0f, 1.0f,
+};
+
 
 GLFWwindow* initRenderData(void){
     window = createWindow();
@@ -19,30 +26,17 @@ GLFWwindow* initRenderData(void){
 }
 
 
-static inline void buildModelMatrix(float* dest, float x, float y, float z, float sx, float sy, float sz, float rotX, float rotY, float rotZ){
-    (void)rotX; (void)rotY; (void)rotZ;  // Suppress unused warnings
-    
-    // Column-major mat4: scale then translate
-    // | sx  0   0   tx |
-    // | 0   sy  0   ty |
-    // | 0   0   sz  tz |
-    // | 0   0   0   1  |
-    dest[0]  = sx;   dest[1]  = 0.0f; dest[2]  = 0.0f; dest[3]  = 0.0f; 
-    dest[4]  = 0.0f; dest[5]  = sy;   dest[6]  = 0.0f; dest[7]  = 0.0f; 
-    dest[8]  = 0.0f; dest[9]  = 0.0f; dest[10] = sz;   dest[11] = 0.0f; 
-    dest[12] = x;    dest[13] = y;    dest[14] = z;    dest[15] = 1.0f; 
+static inline void setCameraData(void){
+    glUniformMatrix4fv(uView, 1, GL_FALSE, defaultCamera);
 }
 
-// Pack all entity transforms into SSBO as mat4 model matrices
-static void packEntityMatrices(float* buffer, Entities_t* entities, int startIndex){
-    const int count = entities->count;
-    for (int i = 0; i < count; i++){
-        float* mat = buffer + (startIndex + i) * FLOATS_PER_INSTANCE;
-        buildModelMatrix(mat, entities->x[i], entities->y[i], entities->z[i], entities->width[i], entities->height[i], entities->length[i], 0.0f, 0.0f, 0.0f);  
+static void loadBuffer(int offset, int size, float* dest, float* src){
+    for(int i = 0; i < size; i++){
+        dest[4*i + offset] = src[i];
     }
 }
 
-static void drawECS(Entities_t* creatures, Entities_t* constructs){
+static void drawEntities(Entities_t* creatures, Entities_t* constructs){
 
     const int creatureCount = creatures->count;
     const int constructsCount = constructs->count;
@@ -57,8 +51,16 @@ static void drawECS(Entities_t* creatures, Entities_t* constructs){
         return;
     }
 
-    packEntityMatrices(buffer, creatures, 0);
-    packEntityMatrices(buffer, constructs, creatureCount);
+    loadBuffer(0, creatureCount, buffer, creatures->x);
+    loadBuffer(1, creatureCount, buffer, creatures->y);
+    loadBuffer(2, creatureCount, buffer, creatures->width);
+    loadBuffer(3, creatureCount, buffer, creatures->height);
+
+    float* conBuffer = buffer + (creatureCount * 4);
+    loadBuffer(0, constructsCount, conBuffer, constructs->x);
+    loadBuffer(1, constructsCount, conBuffer, constructs->y);
+    loadBuffer(2, constructsCount, conBuffer, constructs->width);
+    loadBuffer(3, constructsCount, conBuffer, constructs->height);
 
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
@@ -68,12 +70,11 @@ static void drawECS(Entities_t* creatures, Entities_t* constructs){
 
 
 
-void draw(ECS_t* ecs, Mat4 camera){
+void draw(ECS_t* ecs){
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    glUniformMatrix4fv(uView, 1, GL_FALSE, camera);
-    drawECS(&ecs->creatures, &ecs->constructs);
+    setCameraData();
+    drawEntities(&ecs->creatures, &ecs->constructs);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

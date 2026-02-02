@@ -6,13 +6,13 @@
 */
 #include "director.h"
 #include "render/draw.h"
-#include "camera/camera.h"
 #include "ecs/entities.h"
+#include "types.h"
 #include <stdlib.h>
 #include <stdio.h>
 
 static GLFWwindow* window = NULL;
-static Mat4 camera;
+static Vec2 camera;
 static ECS_t ecs;
 
 
@@ -30,7 +30,7 @@ void teardown(void){
 
 void run(void){
     while(!glfwWindowShouldClose(window)){
-        draw(&ecs, camera);
+        draw(&ecs);
         
     }  
     
@@ -47,7 +47,6 @@ void setup(void){
     // setControls(window);
     initECS(&ecs);
 
-    newDefaultCamera(camera);
 
     run();
 }
