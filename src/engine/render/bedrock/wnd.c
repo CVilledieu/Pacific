@@ -41,6 +41,13 @@ GLFWwindow* createWindow(void){
         return NULL;
     }
 
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
+
     glfwSetFramebufferSizeCallback(window, callback_wndSize_Update);
     return window;
 }

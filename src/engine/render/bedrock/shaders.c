@@ -1,5 +1,10 @@
-#include "foundation.h"
+/*
+    Due to the simplicity of my shaders a few short cuts have been taken.
+     - Shader program is only called on init, because nothing should cause the shader program to be unmounted for the duration of the app.
+     - Shader only has 1 uniform to be called, so the name of the uniform has been hard coded
+*/
 
+#include "foundation.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -10,6 +15,12 @@
 #define VERTEX_FILE "default.vert" 
 #define FRAG_FILE "default.frag"
 
+static unsigned int defaultShdaderID = 0;
+
+//If multiple shaders are needed down the road can add enum parameter to determine which program id to use
+unsigned int getUniformAddress(void){
+    return glGetUniformLocation(defaultShdaderID, "uView");
+}
 
 static unsigned int compileShader(const char* shaderName, GLenum shaderType){
     char path[256];
@@ -47,17 +58,21 @@ static unsigned int compileShader(const char* shaderName, GLenum shaderType){
     return shader;
 }
 
-unsigned int createShaders(void){
+
+
+void initShader(void){
     unsigned int vertexShader = compileShader(VERTEX_FILE, GL_VERTEX_SHADER);
     unsigned int fragmentShader = compileShader(FRAG_FILE, GL_FRAGMENT_SHADER);
 
-    unsigned int ShaderPID  = glCreateProgram();
-    glAttachShader(ShaderPID , vertexShader);
-    glAttachShader(ShaderPID, fragmentShader);
-    glLinkProgram(ShaderPID );
+    defaultShdaderID  = glCreateProgram();
+    glAttachShader(defaultShdaderID , vertexShader);
+    glAttachShader(defaultShdaderID, fragmentShader);
+    glLinkProgram(defaultShdaderID );
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    return ShaderPID;
+    // Nothing should remove Program, so at the moment its safe to call before rendering process.
+    // Also saves processing to call once before rendering instead of each render call
+    glUseProgram(defaultShdaderID);
 }

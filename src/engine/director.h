@@ -5,13 +5,6 @@
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
 
-typedef struct Director_t{
-    GLFWwindow* window;
-    Scene_t* currentScene;
-} Director_t;
-
-
-
 void setup(void);
 void teardown(void);
 

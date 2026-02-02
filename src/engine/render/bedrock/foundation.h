@@ -5,6 +5,12 @@
 #include <GLFW/glfw3.h>
 
 #include "engine/types.h"
+
+
+// Each instance stores a full mat4 model matrix (16 floats, computed on CPU)
+#define FLOATS_PER_INSTANCE 16
+#define TRANSFORM_BUFFER_SIZE (MAX_MODEL_COUNT * FLOATS_PER_INSTANCE * sizeof(float))
+
 // Window
 // =========
 GLFWwindow* createWindow(void);
@@ -16,27 +22,16 @@ GLFWwindow* createWindow(void);
 typedef struct Mesh_t{
     unsigned int VO;
     unsigned int indices;
+    unsigned int ssbo;
 } Mesh_t;
 
-void createMeshes(Mesh_t* meshes);
-unsigned int createTransformSSBO(void);
+void createMesh(Mesh_t* mesh);
+
 
 // Shaders function
 // ===============
 
-unsigned int createShaders(void);
-
-//Possible shader type
-typedef enum {
-    uVIEW,
-    TOTAL_UNIFORMS,
-} Uniforms;
-
-typedef struct Shader_t{
-    unsigned int pid;
-    unsigned int uLocs[TOTAL_UNIFORMS];
-    char* uNames[TOTAL_UNIFORMS];
-} Shader_t;
-
+void initShader(void);
+unsigned int getUniformAddress(void);
 
 #endif

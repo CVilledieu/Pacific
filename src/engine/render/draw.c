@@ -3,94 +3,79 @@
 
 #include "engine/types.h"
 
-typedef enum {
-    dW = 0,
-    dH = 5,
-    dL = 10,
-    dX = 12,
-    dY = 13,
-} MatMap;
+static GLFWwindow* window = NULL;
 
-static Render_t driver = {0};
+static unsigned int uView = 0;
+static Mesh_t mesh = {0};
+
 
 GLFWwindow* initRenderData(void){
-    driver.window = createWindow();
-    driver.shaderID = createShaders();
-    createMeshes(driver.meshes);
-    driver.ssboTransforms = createTransformSSBO();
-    driver.viewUniformLocation = glGetUniformLocation(driver.shaderID, "uView");
+    window = createWindow();
+    initShader();
+    uView = getUniformAddress();
 
-    // Nothing should remove Program, so at the moment its safe to call before rendering process.
-    // Also saves processing to call once before rendering instead of each render call
-    glUseProgram(driver.shaderID); 
-
-    return driver.window;
+    createMesh(&mesh);
+    return window;
 }
 
 
+static inline void buildModelMatrix(float* dest, float x, float y, float z, float sx, float sy, float sz, float rotX, float rotY, float rotZ){
+    (void)rotX; (void)rotY; (void)rotZ;  // Suppress unused warnings
+    
+    // Column-major mat4: scale then translate
+    // | sx  0   0   tx |
+    // | 0   sy  0   ty |
+    // | 0   0   sz  tz |
+    // | 0   0   0   1  |
+    dest[0]  = sx;   dest[1]  = 0.0f; dest[2]  = 0.0f; dest[3]  = 0.0f; 
+    dest[4]  = 0.0f; dest[5]  = sy;   dest[6]  = 0.0f; dest[7]  = 0.0f; 
+    dest[8]  = 0.0f; dest[9]  = 0.0f; dest[10] = sz;   dest[11] = 0.0f; 
+    dest[12] = x;    dest[13] = y;    dest[14] = z;    dest[15] = 1.0f; 
+}
 
-static inline void updateMapBuffer(int offset, int count, float* dest, float* source){
+// Pack all entity transforms into SSBO as mat4 model matrices
+static void packEntityMatrices(float* buffer, Entities_t* entities, int startIndex){
+    const int count = entities->count;
     for (int i = 0; i < count; i++){
-        dest[i * 4 + offset] = source[i];
+        float* mat = buffer + (startIndex + i) * FLOATS_PER_INSTANCE;
+        buildModelMatrix(mat, entities->x[i], entities->y[i], entities->z[i], entities->width[i], entities->height[i], entities->length[i], 0.0f, 0.0f, 0.0f);  
     }
 }
 
-static void drawEntityList(EntityList_t* cast){
-    if (cast->count == 0) return;
-    Mesh_t mesh = driver.meshes[cast->baseType];
+static void drawECS(Entities_t* creatures, Entities_t* constructs){
+
+    const int creatureCount = creatures->count;
+    const int constructsCount = constructs->count;
+
     glBindVertexArray(mesh.VO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, driver.ssboTransforms);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, mesh.ssbo);
     
-    float* mapBuffer = (float*)glMapBufferRange(
-        GL_SHADER_STORAGE_BUFFER,
-        0,
-        cast->count * 4 * sizeof(float),
-        GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT
-    );
-    
-    if (!mapBuffer) {
+    float* buffer = glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, TRANSFORM_BUFFER_SIZE, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+
+    if (!buffer){
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
         return;
     }
-    
-    const int count = cast->count;
 
-    updateMapBuffer(0, count, mapBuffer, cast->x);
-    updateMapBuffer(1, count, mapBuffer, cast->y);
-    updateMapBuffer(2, count, mapBuffer, cast->width);
-    updateMapBuffer(3, count, mapBuffer, cast->height);
-    
+    packEntityMatrices(buffer, creatures, 0);
+    packEntityMatrices(buffer, constructs, creatureCount);
+
     glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-    glDrawElementsInstanced(GL_TRIANGLES, mesh.indices, GL_UNSIGNED_INT, 0, cast->count);
+    glDrawElementsInstanced(GL_TRIANGLES, mesh.indices, GL_UNSIGNED_INT, 0, (creatureCount + constructsCount));
 }
 
-// Place holder until multiple meshes are going to be drawn at the sametime. 
-// At that time this will be expanded on.
-void drawEntities(EntityList_t** allLists, int size){
-    for (int i = 0; i < size; i++){
-        drawEntityList(allLists[i]);
-    }
-}
 
-void draw(Scene_t* scene){
+
+void draw(ECS_t* ecs, Mat4 camera){
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    // Only one Vertex array at the moment, so no need to unbind and rebind. Current binding will be set right before draw
-    // glBindVertexArray(driver.mesh); 
-    glUniformMatrix4fv(driver.viewUniformLocation, 1, GL_FALSE, scene->camera);
-    drawEntities(scene->allLists, scene->listCount);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    glUniformMatrix4fv(uView, 1, GL_FALSE, camera);
+    drawECS(&ecs->creatures, &ecs->constructs);
 
-    // glBindVertexArray(0);
-    glfwSwapBuffers(driver.window);
+    glfwSwapBuffers(window);
     glfwPollEvents();
 }
 
-void cleanup(void){
-    if (driver.window) {
-        glfwDestroyWindow(driver.window);
-    }
-    
-    glfwTerminate();
-}
