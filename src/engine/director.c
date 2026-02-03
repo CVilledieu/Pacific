@@ -1,56 +1,51 @@
-/*
-    Director:
-        contains the central logic for game engine.
-
-
-*/
 #include "director.h"
-#include "render/draw.h"
-#include "ecs/entities.h"
-#include "types.h"
-#include <stdlib.h>
-#include <stdio.h>
+#include "scene/entities.h"
 
-static GLFWwindow* window = NULL;
-static Vec2 camera;
-static ECS_t ecs;
+#include "glad/glad.h"
+#include <glfw/glfw3.h>
 
 
-void teardown(void){
-    if (window) {
-        glfwDestroyWindow(window);
-    }
-    
 
-    #ifdef DEBUG_MODE
-        printErrLog();
-    #endif
-    glfwTerminate();
+Catalog_t creatures = {0};
+Catalog_t constructs = {0};
+
+void setHero(void);
+
+void initDirector(GLFWwindow* window){
+    glfwSetKeyCallback(window, controlCallback);
+    setHero();
+
 }
 
-void run(void){
-    while(!glfwWindowShouldClose(window)){
-        draw(&ecs);
-        
-    }  
-    
-    teardown();
-}
-
-void setup(void){
-    window = initRenderData();
-
-    if (!window) {
-        printf("ERROR: Failed to create window\n");
-        return;
-    }
-    // setControls(window);
-    initECS(&ecs);
+void update(void){
+    glfwPollEvents();
+    moveEntities();
 
 
-    run();
 }
 
 
+// Index zero of creatures is reserved / occupide by the player controlled unit aka the Hero unit
+void setHero(void){
+    creatures.x[0] = DEFAULT_HERO_X;
+    creatures.y[0] = DEFAULT_HERO_Y;
+    creatures.width[0] = DEFAULT_HERO_W;
+    creatures.height[0] = DEFAULT_HERO_H;
+    creatures.count = 1;
+}
 
+void newCreature(Object_t obj){
+    if (creatures.count >= MAX_MODEL_COUNT) return;
 
+    int id = creatures->count;
+    creatures->x[id] = pos[X];
+    creatures->y[id] = pos[Y];
+
+    creatures->width[id] = size[X];
+    creatures->height[id] = size[Y];
+
+    creatures->dX[id] = speed[X];
+    creatures->dY[id] = speed[Y];
+
+    creatures->count++;
+}

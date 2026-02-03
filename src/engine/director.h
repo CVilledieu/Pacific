@@ -2,13 +2,12 @@
 #define __DIRECTOR_H__
 
 #include "types.h"
-#include "glad/glad.h"
-#include <GLFW/glfw3.h>
 
-void setup(void);
-void teardown(void);
+extern Entities_t creatures;
+extern Entities_t constructs;
 
+void initDirector(GLFWwindow* window);
 
-void run(void);
+void update(void);
 
 #endif

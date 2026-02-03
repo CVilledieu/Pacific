@@ -9,8 +9,8 @@ static unsigned int uView = 0;
 static Mesh_t mesh = {0};
 
 static float defaultCamera[16] = {
-    1.0f, 0.0f, 0.0f, 0.0f,
-    0.0f, 1.0f, 0.0f, 0.0f,
+    0.2f, 0.0f, 0.0f, 0.0f,
+    0.0f, 0.2f, 0.0f, 0.0f,
     0.0f, 0.0f, 1.0f, 0.0f,
     0.0f, 0.0f, 0.0f, 1.0f,
 };
@@ -77,6 +77,5 @@ void draw(ECS_t* ecs){
     drawEntities(&ecs->creatures, &ecs->constructs);
 
     glfwSwapBuffers(window);
-    glfwPollEvents();
 }
 
